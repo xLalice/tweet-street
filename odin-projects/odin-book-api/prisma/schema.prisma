@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  firstName    String @map("first_name")
+  lastName     String @map("last_name")
+  email        String @unique
+  password     String
+  profilePic   String? @default("https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg")
+  age          Int?
+  bio          String?
+  isPrivate    Boolean    @default(false)
+  following  Follow[]   @relation("Following")
+  followers  Follow[]   @relation("Followers")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts        Post[]
+  comments     Comment[]
+
+}
+
+model Follow {
+  id          String        @id @default(uuid())
+  followerId  String
+  followingId String
+  status      FollowStatus
+  
+  follower    User      @relation("Followers", fields: [followerId], references: [id])
+  following   User      @relation("Following", fields: [followingId], references: [id])
+  
+  @@unique([followerId, followingId])
+}
+
+model Post {
+  id  String   @id   @default(uuid())
+  title String
+  content String
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  authorId  String
+  author  User  @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+}
+
+
+model Comment {
+  id  String  @id @default(uuid())
+  content String
+  imageUrl String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  postId  String
+  post  Post  @relation(fields: [postId], references: [id])
+  authorId  String
+  author  User  @relation(fields: [authorId], references: [id])
+}
+
+enum FollowStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
