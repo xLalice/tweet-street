@@ -6,7 +6,7 @@ interface ModalProps {
     eventTitle?: string; 
     eventStatus?: string; 
     eventPlatform?: string; 
-    scheduledTime?: Date; 
+    scheduledTime?: Date;
     onSave?: (updatedContent: string, updatedTime: string) => void;
 }
 
