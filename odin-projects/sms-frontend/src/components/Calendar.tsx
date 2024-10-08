@@ -13,12 +13,16 @@ interface Post {
     platform: string;
     scheduledTime: string;
     status: string;
+    latitude?: number;
+    longitude?: number;
 }
 
 interface ColoredEvent extends Event {
     id?: number;
     color?: string;
     status?: string;
+    latitude?: number;
+    longitude?: number
 }
 
 const CalendarView: React.FC = () => {
@@ -41,8 +45,11 @@ const CalendarView: React.FC = () => {
                     allDay: false,
                     color: getEventColor(post.status),
                     status: post.status,
+                    latitude: post.latitude,
+                    longitude: post.longitude
                 }));
                 setEvents(events);
+                console.log("Events: ", events);
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
@@ -57,8 +64,8 @@ const CalendarView: React.FC = () => {
                 return "bg-blue-500";
             case "POSTED":
                 return "bg-green-500";
-            case "DRAFT":
-                return "bg-yellow-500";
+            case "FAILED":
+                return "bg-red-500";
             default:
                 return "bg-gray-500";
         }
@@ -83,7 +90,7 @@ const CalendarView: React.FC = () => {
 
     const handleEventSave = async (updatedContent: string, updatedTime: string) => {
       if (selectedEvent) {
-          const result = await updatePost(selectedEvent.id!, {
+          await updatePost(selectedEvent.id!, {
               content: updatedContent,
               scheduledTime: updatedTime, 
           });
@@ -134,6 +141,8 @@ const CalendarView: React.FC = () => {
                     eventStatus={selectedEvent.status}
                     scheduledTime={selectedEvent.end}
                     onSave={handleEventSave}
+                    latitude={selectedEvent.latitude}
+                    longitude={selectedEvent.longitude}
                 />
             )}
         </div>

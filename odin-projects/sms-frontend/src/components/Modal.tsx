@@ -7,6 +7,8 @@ interface ModalProps {
     eventStatus?: string; 
     eventPlatform?: string; 
     scheduledTime?: Date;
+    latitude?: number;  
+    longitude?: number;
     onSave?: (updatedContent: string, updatedTime: string) => void;
 }
 
@@ -16,8 +18,9 @@ const Modal: React.FC<ModalProps> = ({
     
     eventTitle = "No Title", 
     eventStatus = "Unknown", 
-    eventPlatform = "Unknown", 
     scheduledTime,
+    latitude,
+    longitude,
     onSave
 }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -32,6 +35,10 @@ const Modal: React.FC<ModalProps> = ({
         }
         setIsEditing(false); // Reset editing mode after saving
     };
+
+    const googleMapsUrl = latitude && longitude
+        ? `https://www.google.com/maps/embed/v1/view?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&center=${latitude},${longitude}&zoom=14`
+        : '';
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -64,6 +71,22 @@ const Modal: React.FC<ModalProps> = ({
                         <p className="text-gray-700"><strong>Status:</strong> {eventStatus}</p>
                         {scheduledTime && (
                             <p className="text-gray-700"><strong>Scheduled Time:</strong> {new Date(scheduledTime).toLocaleString()}</p> // Format the scheduled time
+                        )}
+                        {latitude && longitude ? (
+                            <div className="my-4">
+                                <h3 className="text-lg font-bold mb-2">Location</h3>
+                                <iframe
+                                    title="Google Maps Location"
+                                    width="100%"
+                                    height="300"
+                                    frameBorder="0"
+                                    style={{ border: 0 }}
+                                    src={googleMapsUrl}
+                                    allowFullScreen
+                                />
+                            </div>
+                        ) : (
+                            <p className="text-gray-500">Location not available.</p>
                         )}
                     </div>
                 )}

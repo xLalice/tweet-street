@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.19.3",
     "@types/react-big-calendar": "^1.8.12",
     "axios": "^1.7.7",
     "lucide-react": "^0.447.0",
@@ -17,6 +18,7 @@
     "react": "^18.3.1",
     "react-big-calendar": "^1.15.0",
     "react-dom": "^18.3.1",
+    "react-geocode": "^1.0.0-alpha.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
