@@ -101,6 +101,7 @@ const CalendarView: React.FC = () => {
                         ...event,
                         title: updatedContent,
                         end: new Date(updatedTime),
+                        color: event.color,
                     }
                   : event
           );

@@ -1,6 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Logo from "../../assets/logo.png"
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { verifyAuth } from '../../services/api';
 
 const OAuthLogin: React.FC = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuthToken = async () => {
+      const token = localStorage.getItem('authToken');
+
+      if (token) {
+        try {
+          const result = await verifyAuth();
+          if (result.authenticated) {
+            navigate('/'); 
+          } else {
+            setLoading(false); 
+          }
+        } catch (error) {
+          console.error('Error verifying token:', error);
+          setLoading(false); 
+        }
+      } else {
+        setLoading(false); 
+      }
+    };
+
+    checkAuthToken();
+  }, [navigate]);
+
 
   const handleTwitterLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/twitter`;
@@ -11,7 +41,7 @@ const OAuthLogin: React.FC = () => {
       <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://source.unsplash.com/random/1920x1080/?nature')" }} />
       <div className="absolute inset-0 bg-black opacity-50" />
       <div className="relative z-10 flex flex-col items-center justify-center p-4">
-        <h2 className="text-4xl font-extrabold text-white mb-6 animate-bounce">Connect Your Twitter</h2>
+        <h2 className="text-4xl font-extrabold text-white mb-6 animate-bounce"><img src={Logo} alt="" /></h2>
         <p className="text-lg text-gray-300 mb-4 text-center">Join us to share your thoughts and connect with others!</p>
         <button
           onClick={handleTwitterLogin}

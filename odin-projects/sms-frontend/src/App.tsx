@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import OAuthLogin from "./components/auth/OAuthLogin";
 import CalendarView from "./components/Calendar";
 import PostForm from "./components/PostForm";
-import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import AuthCallback from './components/AuthCallback';
 
 function App() {
-  const [showNavbar, setShowNavbar] = useState(true);
+  const [showNavbar, setShowNavbar] = useState(false);
 
   return (
     <Router>
-      {showNavbar && <Navbar setShowNavbar={setShowNavbar}/>} {/* Conditionally render the navbar */}
+      {showNavbar && <Navbar setShowNavbar={setShowNavbar}/>} 
 
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<OAuthLogin />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute setShowNavbar={setShowNavbar} />}>
           <Route path="/" element={<CalendarView />} />
           <Route path="/create-post" element={<PostForm />} />
-          {/* <Route path="/edit-post/:id" element={<PostEditModal post={} onClose={() => setPost(null)} onSave={() => console.log("Post saved!")} />} /> */}
         </Route>
 
         {/* 404 Route */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../services/api'; 
+import Logo from "../assets/logo.png";
 
 const Navbar: React.FC<{ setShowNavbar: (show: boolean) => void }> = ({ setShowNavbar }) => {
   const navigate = useNavigate();
@@ -16,10 +17,10 @@ const Navbar: React.FC<{ setShowNavbar: (show: boolean) => void }> = ({ setShowN
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 shadow-lg fixed top-0 left-0 w-full z-99">
+    <nav className="bg-blue-600 text-white p-4 shadow-lg  w-full z-99">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-xl font-semibold">
-          <Link to="/">XXX</Link>
+          <Link to="/"><img src={Logo} alt="" className=' h-20 '/></Link>
         </div>
 
         <div className="flex space-x-4">
