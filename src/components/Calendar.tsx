@@ -17,6 +17,7 @@ interface Post {
     status: string;
     latitude?: number;
     longitude?: number;
+    imageUrl?: string;
 }
 
 // Extend the Event interface to include additional properties
@@ -26,6 +27,7 @@ interface ColoredEvent extends Event {
     status?: string;
     latitude?: number;
     longitude?: number;
+    imageUrl?: string;
 }
 
 const CalendarView: React.FC = () => {
@@ -52,6 +54,7 @@ const CalendarView: React.FC = () => {
                     status: post.status,
                     latitude: post.latitude,
                     longitude: post.longitude,
+                    imageUrl: post.imageUrl
                 }));
                 setEvents(events); // Update events state
                 console.log("Events: ", events);
@@ -155,6 +158,7 @@ const CalendarView: React.FC = () => {
                     onSave={handleEventSave} // Pass save handler
                     latitude={selectedEvent.latitude} // Pass latitude
                     longitude={selectedEvent.longitude} // Pass longitude
+                    imageUrl={selectedEvent.imageUrl} // Pass image URL to modal
                 />
             )}
         </div>

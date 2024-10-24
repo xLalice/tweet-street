@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Calendar, Clock } from "lucide-react"; // Import icons for the calendar and clock
 import { createPost } from "../services/api"; // Import the API service for creating posts
+import axios from "axios"; // For making API calls to Unsplash
 
 // Define the shape of the post form data
 interface PostFormData {
@@ -8,18 +9,24 @@ interface PostFormData {
     scheduledDate: string;
     scheduledTime: string;
     location: string;
+    imageUrl: string; // Add image URL to form data
 }
 
+const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY; // Add your Unsplash Access Key here
+
 const PostForm: React.FC = () => {
-    // State to manage form data, error messages, and success messages
+    // State to manage form data, error messages, success messages, and Unsplash search results
     const [formData, setFormData] = useState<PostFormData>({
         content: "",
         scheduledDate: "",
         scheduledTime: "",
         location: "",
+        imageUrl: "", // Initialize with an empty string
     });
     const [error, setError] = useState<string>(""); // State for error messages
     const [successMessage, setSuccessMessage] = useState<string>(""); // State for success messages
+    const [unsplashResults, setUnsplashResults] = useState<string[]>([]); // State for Unsplash search results
+    const [searchTerm, setSearchTerm] = useState<string>(""); // State for Unsplash search term
 
     // Handle input changes and update the form data state
     const handleInputChange = (
@@ -31,6 +38,34 @@ const PostForm: React.FC = () => {
         });
     };
 
+    // Handle Unsplash image search
+    const handleImageSearch = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent default form submission
+        if (!searchTerm) {
+            setError("Please enter a search term for images.");
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=${UNSPLASH_ACCESS_KEY}`
+            );
+            const images = response.data.results.map(
+                (img: any) => img.urls.small
+            ); // Get image URLs (small size for preview)
+            setUnsplashResults(images); // Update Unsplash results
+            setError(""); // Clear error if successful
+        } catch (error) {
+            console.error("Error fetching images from Unsplash:", error);
+            setError("Failed to fetch images from Unsplash.");
+        }
+    };
+
+    // Handle image selection
+    const handleImageSelect = (url: string) => {
+        setFormData({ ...formData, imageUrl: url }); // Update the form data with selected image URL
+        setSuccessMessage("Image selected!"); // Set success message for image selection
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent the default form submission behavior
@@ -40,9 +75,9 @@ const PostForm: React.FC = () => {
             !formData.content ||
             !formData.scheduledDate ||
             !formData.scheduledTime ||
-            !formData.location
+            !formData.location 
         ) {
-            setError("All fields are required."); // Set error if any field is empty
+            setError("All fields are required"); // Set error if any field is empty
             setSuccessMessage(""); // Clear success message
             return;
         }
@@ -62,7 +97,10 @@ const PostForm: React.FC = () => {
                 scheduledDate: "",
                 scheduledTime: "",
                 location: "",
+                imageUrl: "",
             });
+            setUnsplashResults([]); // Clear Unsplash results
+            setSearchTerm(""); // Clear search term
         } catch (error) {
             console.error("Error scheduling post:", error); // Log any errors encountered
             setError("Failed to schedule post."); // Set error message for failed submission
@@ -143,10 +181,51 @@ const PostForm: React.FC = () => {
                     />
                 </div>
 
+                {/* Unsplash Image Search */}
+                <div>
+                    <label className="block text-gray-700 font-semibold mb-2">
+                        Search for an Image:
+                    </label>
+                    <div className="flex space-x-2">
+                        <input
+                            type="text"
+                            placeholder="Search images..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                        />
+                        <button
+                            onClick={handleImageSearch}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                {/* Display Unsplash results */}
+                {unsplashResults.length > 0 && (
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                        {unsplashResults.map((imgUrl) => (
+                            <img
+                                key={imgUrl}
+                                src={imgUrl}
+                                alt="Unsplash result"
+                                className={`cursor-pointer w-full h-auto rounded-lg border ${
+                                    formData.imageUrl === imgUrl
+                                        ? "border-indigo-600"
+                                        : "border-transparent"
+                                }`}
+                                onClick={() => handleImageSelect(imgUrl)}
+                            />
+                        ))}
+                    </div>
+                )}
+
                 {/* Display error or success messages */}
-                {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 {successMessage && (
-                    <p className="text-green-500 text-sm mt-1">
+                    <p className="text-green-500 text-sm mt-2">
                         {successMessage}
                     </p>
                 )}
@@ -154,7 +233,7 @@ const PostForm: React.FC = () => {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200 transform hover:scale-105"
+                    className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                 >
                     Schedule Post
                 </button>
@@ -163,4 +242,4 @@ const PostForm: React.FC = () => {
     );
 };
 
-export default PostForm; // Export the PostForm component for use in other parts of the application
+export default PostForm;
